@@ -1,0 +1,32 @@
+package cmd
+
+import (
+	"runtime/debug"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+)
+
+var (
+	Version = "dev"
+	Commit  = "none"
+	Date    = "unknown"
+)
+
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print the version number",
+	Run: func(cmd *cobra.Command, args []string) {
+		if info, ok := debug.ReadBuildInfo(); ok && info.Main.Sum != "" {
+			Version = info.Main.Version
+			Commit = info.Main.Sum
+		}
+		logrus.Infof("version: \t %s", Version)
+		logrus.Infof("commit: \t %s", Commit)
+		logrus.Infof("date: \t %s", Date)
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(versionCmd)
+}

@@ -1,9 +1,19 @@
 package main
 
 import (
-    "github.com/nousefreak/warpdir/cmd"
+	"github.com/nousefreak/warpdir/cmd"
+)
+
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 func main() {
-  cmd.Execute()   
+	cmd.Version = version
+	cmd.Commit = commit
+	cmd.Date = date
+
+	cmd.Execute()
 }
