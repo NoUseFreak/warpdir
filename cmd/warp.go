@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"sort"
 
 	fuzzyfinder "github.com/ktr0731/go-fuzzyfinder"
 	"github.com/sirupsen/logrus"
@@ -87,5 +88,8 @@ func newFzfItemSlice(index map[string]string) []fzfItem {
 	for name, path := range index {
 		items = append(items, fzfItem{name, path})
 	}
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].name > items[j].name
+	})
 	return items
 }
