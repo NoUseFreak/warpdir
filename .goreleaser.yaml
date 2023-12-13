@@ -1,8 +1,3 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
-
-# The lines below are called `modelines`. See `:help modeline`
-# Feel free to remove those if you don't want/need to use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 env:
@@ -16,6 +11,7 @@ before:
   hooks:
     - go mod tidy
     - ./scripts/manpages.sh
+    - ./scripts/completions.sh
 
 builds:
   - env:
@@ -45,6 +41,7 @@ archives:
       - README.md
       - LICENSE
       - manpages/*
+      - completions/*
 
 changelog:
   sort: asc
@@ -89,6 +86,9 @@ brews:
     install: |-
       bin.install "{{ .ProjectName }}"
     extra_install: |-
+      bash_completion.install "completions/warpdir.bash" => "warpdir"
+      zsh_completion.install "completions/warpdir.zsh" => "_warpdir"
+      fish_completion.install "completions/warpdir.fish"
       man1.install "manpages/warpdir.1.gz"
 
 nfpms:
@@ -108,6 +108,18 @@ nfpms:
           mode: 0644
       - src: ./manpages/warpdir.1.gz
         dst: /usr/share/man/man1/warpdir.1.gz
+        file_info:
+          mode: 0644
+      - src: ./completions/warpdir.bash
+        dst: /usr/share/bash-completion/completions/warpdir
+        file_info:
+          mode: 0644
+      - src: ./completions/warpdir.fish
+        dst: /usr/share/fish/vendor_completions.d/warpdir.fish
+        file_info:
+          mode: 0644
+      - src: ./completions/warpdir.zsh
+        dst: /usr/share/zsh/vendor-completions/_warpdir
         file_info:
           mode: 0644
     formats:
