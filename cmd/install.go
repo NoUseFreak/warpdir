@@ -9,18 +9,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var installCmd = &cobra.Command{
-	Use:   "install",
-	Short: "Install the wd command",
-	Run: func(cmd *cobra.Command, args []string) {
-		exec, _ := os.Executable()
-		script := fmt.Sprintf("%s () { eval $(%s $@) }", cmdName, exec)
-		installScript(script, os.Getenv("SHELL"))
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(installCmd)
+func getInstallCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "install",
+		Short: "Install the wd command",
+		Run: func(cmd *cobra.Command, args []string) {
+			exec, _ := os.Executable()
+			script := fmt.Sprintf("%s () { eval $(%s $@) }", cmdName, exec)
+			installScript(script, os.Getenv("SHELL"))
+		},
+	}
 }
 
 func installScript(script string, shell string) {

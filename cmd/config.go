@@ -3,23 +3,12 @@ package cmd
 import (
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var (
-	cfgFile string
-)
 
-func init() {
-	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.warpdir.yaml)")
-	if err := rootCmd.PersistentFlags().MarkHidden("config"); err != nil {
-		logrus.Error(err)
-	}
-}
 
 func initConfig() {
 	home, err := homedir.Dir()
@@ -36,7 +25,8 @@ func initConfig() {
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
-		if err := viper.SafeWriteConfigAs(home + "/.warpdir.yaml"); err != nil {
+        logrus.Warn(err)
+		if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
 			logrus.Error(err)
 			os.Exit(1)
 		}

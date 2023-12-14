@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/ktr0731/go-fuzzyfinder v0.8.0
+	github.com/mattn/go-isatty v0.0.20
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/muesli/mango-cobra v1.2.0
 	github.com/muesli/roff v0.1.0

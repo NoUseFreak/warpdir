@@ -9,25 +9,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var manCmd = &cobra.Command{
-	Use:                   "man",
-	Short:                 "Generates command line manpages",
-	SilenceUsage:          true,
-	DisableFlagsInUseLine: true,
-	Hidden:                true,
-	Args:                  cobra.NoArgs,
-	ValidArgsFunction:     cobra.NoFileCompletions,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		manPage, err := mcoral.NewManPage(1, rootCmd.Root())
-		if err != nil {
+func getManCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:                   "man",
+		Short:                 "Generates command line manpages",
+		SilenceUsage:          true,
+		DisableFlagsInUseLine: true,
+		Hidden:                true,
+		Args:                  cobra.NoArgs,
+		ValidArgsFunction:     cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			manPage, err := mcoral.NewManPage(1, cmd.Parent().Root())
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprint(os.Stdout, manPage.Build(roff.NewDocument()))
 			return err
-		}
-
-		_, err = fmt.Fprint(os.Stdout, manPage.Build(roff.NewDocument()))
-		return err
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(manCmd)
+		},
+	}
 }

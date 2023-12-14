@@ -2,65 +2,71 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"sort"
 
 	fuzzyfinder "github.com/ktr0731/go-fuzzyfinder"
+	"github.com/mattn/go-isatty"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var warpCmd = &cobra.Command{
-	Use:   "warp",
-	Short: "Warp to a directory",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		name := ""
-		if len(args) > 0 {
-			name = args[0]
-		}
-
-		index := viper.GetStringMapString("index")
-
-		if name == "-" {
-			history := viper.GetStringSlice("history")
-			if len(history) > 1 {
-				name = history[len(history)-2]
-				return warp(
-					name,
-					index[name],
-				)
+func getWarpCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "warp",
+		Short: "Warp to a directory",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			name := ""
+			if len(args) > 0 {
+				name = args[0]
 			}
-		}
 
-		if target, ok := index[name]; ok {
-			return warp(name, target)
-		}
+			index := viper.GetStringMapString("index")
 
-		data := newFzfItemSlice(index)
-		idx, err := fuzzyfinder.Find(
-			data,
-			func(i int) string {
-				return fmt.Sprintf("%-20s %s", data[i].name, data[i].path)
-			},
-			fuzzyfinder.WithQuery(name),
-		)
-		if err == nil {
-			return warp(data[idx].name, data[idx].path)
-		}
+			if name == "-" {
+				history := viper.GetStringSlice("history")
+				if len(history) > 1 {
+					name = history[len(history)-2]
+					return warp(
+						cmd.OutOrStdout(),
+						name,
+						index[name],
+					)
+				}
+			}
 
-		return err
-	},
+			if target, ok := index[name]; ok {
+				return warp(cmd.OutOrStdout(), name, target)
+			}
+
+            if !isatty.IsTerminal(os.Stdin.Fd()) {
+                return cmd.Root().Usage()
+            }
+
+			data := newFzfItemSlice(index)
+			idx, err := fuzzyfinder.Find(
+				data,
+				func(i int) string {
+					return fmt.Sprintf("%-20s %s", data[i].name, data[i].path)
+				},
+				fuzzyfinder.WithQuery(name),
+			)
+			if err == nil {
+				return warp(cmd.OutOrStdout(), data[idx].name, data[idx].path)
+			}
+
+			return err
+		},
+	}
 }
 
-func init() {
-	rootCmd.AddCommand(warpCmd)
-}
-
-func warp(name string, path string) error {
+func warp(o io.Writer, name string, path string) error {
 	recordHistory(name)
 
 	logrus.Infof("Warping to %s", path)
-	fmt.Printf("cd %s", path)
+	fmt.Fprintf(o, "cd %s", path)
 	return nil
 }
 

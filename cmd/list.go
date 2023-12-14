@@ -6,18 +6,16 @@ import (
 	"github.com/spf13/viper"
 )
 
-var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List all warp points",
-	Run: func(cmd *cobra.Command, args []string) {
-		index := viper.GetStringMap("index")
+func getListCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "list",
+		Short: "List all warp points",
+		Run: func(cmd *cobra.Command, args []string) {
+			index := viper.GetStringMap("index")
 
-		for name, path := range index {
-			logrus.Infof("%-20s (%s)\n", name, path)
-		}
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(listCmd)
+			for name, path := range index {
+				logrus.Infof("%-20s (%s)\n", name, path)
+			}
+		},
+	}
 }
