@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -23,10 +24,10 @@ func getInstallCmd() *cobra.Command {
 
 func installScript(script string, shell string) {
 	var shellFile string
-	switch shell {
-	case "/bin/bash":
+	switch filepath.Base(shell) {
+	case "bash":
 		shellFile = os.Getenv("HOME") + "/.bashrc"
-	case "/bin/zsh":
+	case "zsh":
 		shellFile = os.Getenv("HOME") + "/.zshrc"
 	default:
 		logrus.Errorf("Shell '%s' not supported", shell)
