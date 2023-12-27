@@ -41,9 +41,9 @@ func getWarpCmd() *cobra.Command {
 				return warp(cmd.OutOrStdout(), name, target)
 			}
 
-            if !isatty.IsTerminal(os.Stdin.Fd()) {
-                return cmd.Root().Usage()
-            }
+			if !isatty.IsTerminal(os.Stdin.Fd()) {
+				return cmd.Root().Usage()
+			}
 
 			data := newFzfItemSlice(index)
 			idx, err := fuzzyfinder.Find(
@@ -63,6 +63,12 @@ func getWarpCmd() *cobra.Command {
 }
 
 func warp(o io.Writer, name string, path string) error {
+	curdir, _ := os.Getwd()
+	if curdir == path {
+		logrus.Infof("Already in %s", path)
+		return nil
+	}
+
 	recordHistory(name)
 
 	logrus.Infof("Warping to %s", path)
