@@ -2,13 +2,12 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
-
-
 
 func initConfig() {
 	home, err := homedir.Dir()
@@ -16,16 +15,21 @@ func initConfig() {
 		logrus.Error(err)
 		os.Exit(1)
 	}
+	viper.SetConfigName("warpdir")
+	viper.AddConfigPath(home + "/.config/warpdir")
+	viper.AddConfigPath(home)
 
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
-	} else {
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".warpdir")
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
-        logrus.Warn(err)
+		logrus.Warn(err)
+        cfgFile = home + "/.config/warpdir/warpdir.yaml"
+		if err := os.MkdirAll(filepath.Dir(cfgFile), 0755); err != nil {
+			logrus.Error(err)
+			os.Exit(1)
+		}
 		if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
 			logrus.Error(err)
 			os.Exit(1)
