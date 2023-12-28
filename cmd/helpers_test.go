@@ -44,6 +44,7 @@ func execute(t *testing.T, testCfg string, args ...string) (string, string, erro
 	buferr := bytes.NewBufferString("")
 	bufout := bytes.NewBufferString("")
     logrus.SetOutput(buferr)
+    CommandOutput = bufout
 
 	cmd := GetCLI()
 	cmd.SetOut(bufout)

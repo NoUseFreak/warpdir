@@ -13,6 +13,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var CommandOutput io.Writer = os.Stdout
+
 func getWarpCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "warp",
@@ -38,7 +40,7 @@ func getWarpCmd() *cobra.Command {
 			}
 
 			if target, ok := index[name]; ok {
-				return warp(cmd.OutOrStdout(), name, target)
+				return warp(CommandOutput, name, target)
 			}
 
 			if !isatty.IsTerminal(os.Stdin.Fd()) {
@@ -54,7 +56,7 @@ func getWarpCmd() *cobra.Command {
 				fuzzyfinder.WithQuery(name),
 			)
 			if err == nil {
-				return warp(cmd.OutOrStdout(), data[idx].name, data[idx].path)
+				return warp(CommandOutput, data[idx].name, data[idx].path)
 			}
 
 			return err
